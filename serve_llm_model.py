@@ -4,7 +4,6 @@ from functools import wraps
 import torch
 import json
 import os
-import time
 from threading import Thread
 
 app = Flask(__name__)
@@ -18,10 +17,6 @@ models = {
     "bigger_llm": None
 }
 
-
-
-BATCH_SIZE = 4
-BATCH_INTERVAL = 1.0
 API_TOKEN = os.getenv("LOCAL_API_TOKEN", "metacentrum") 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -34,7 +29,7 @@ def load_models():
         models[model_id] = (model, tokenizer)
 
 
-def generate_stream(prompt, max_tokens,temprature, model_id):
+def generate_stream(prompt, max_tokens, temprature, model_id):
     model, tokenizer = models.get(model_id, (None, None))
     if model is None:
         return "Invalid model parameter"
@@ -45,7 +40,7 @@ def generate_stream(prompt, max_tokens,temprature, model_id):
     generate_kwargs =dict(
         input_ids,
         streamer=streamer,
-        max_new_tokens=1024,
+        max_new_tokens=max_tokens,
         do_sample=True,
         top_p=0.99,
         top_k=1000,
