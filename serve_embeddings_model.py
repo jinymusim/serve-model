@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 model_dict = {
     "small_vectors": "sentence-transformers/all-MiniLM-L6-v2",
-    "bigger_vectors": "sentence-transformers/all-mpnet-base-v2"
+    "bigger_vectors": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
 }
 models = {
     "small_vectors": None,
