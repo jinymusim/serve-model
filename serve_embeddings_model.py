@@ -58,7 +58,7 @@ def generate_embedding():
     if not isinstance(text, list):
         text = [text]
     else:
-        text = [str(t.strip()) if str(t.strip()) else 'NONE' for t in text]
+        text = [str(t).strip() if str(t).strip() else 'NONE' for t in text]
     
     # Generate embedding
     embeddings = model.encode(text)
