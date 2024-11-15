@@ -46,6 +46,7 @@ def generate_stream(prompt, max_tokens, temprature, model_id):
         top_p=0.99,
         top_k=1000,
         temperature=temprature,
+        tokenizer=tokenizer,
         stop_strings=["<|eot_id|>", "<|start_header_id|>", "<|end_header_id|>"]
     )
     t = Thread(target=model.generate, kwargs=generate_kwargs)
