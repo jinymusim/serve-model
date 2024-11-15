@@ -32,7 +32,7 @@ def get_chat_completion(messages):
 
 def get_embedding(text):
     response = embed_client.embeddings.create(
-        model="small_vectors",
+        model="bigger_vectors",
         input=text
     )
     return response.data[0].embedding

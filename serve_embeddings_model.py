@@ -7,11 +7,11 @@ import os
 app = Flask(__name__)
 
 model_dict = {
-    #"small_vectors": "sentence-transformers/all-MiniLM-L6-v2",
+    "small_vectors": "sentence-transformers/all-MiniLM-L6-v2",
     "bigger_vectors": "sentence-transformers/all-mpnet-base-v2"
 }
 models = {
-    #"small_vectors": None,
+    "small_vectors": None,
     "bigger_vectors": None
 }
 
@@ -45,27 +45,29 @@ def requires_auth(f):
 def generate_embedding():
     # Extract data from the request
     data = request.json
-    text = str(data.get('input', ''))
-    if text.strip() == '':
-        text = 'None'
+    text = data.get('input', '')
     model_id = data.get('model', None)
+    if text == '':
+        return Response("Missing input parameter", 400)
     if model_id is None:
         return Response("Missing model parameter", 400)
     model = models.get(model_id)
     if model is None:
         return Response("Invalid model parameter", 400)
     
+    if not isinstance(text, list):
+        text = [text]
     
     # Generate embedding
-    embedding = model.encode(text)
+    embeddings = model.encode(text)
     response = {
         "object": "list",
         "data": [
             {
                 "object": "embedding",
-                "embedding": embedding.squeeze().tolist(),
-                "index": 0
-            }
+                "embedding": embedding.tolist(),
+                "index": i
+            } for i, embedding in enumerate(embeddings)
         ]
     }
     
