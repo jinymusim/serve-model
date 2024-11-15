@@ -5,6 +5,7 @@ import torch
 import json
 import os
 from threading import Thread
+from datetime import date
 
 app = Flask(__name__)
 
@@ -45,7 +46,7 @@ def generate_stream(prompt, max_tokens, temprature, model_id):
         top_p=0.99,
         top_k=1000,
         temperature=temprature,
-        num_beams=1,
+        stop_strings=["<|eot_id|>", "<|start_header_id|>", "<|end_header_id|>"]
     )
     t = Thread(target=model.generate, kwargs=generate_kwargs)
     t.start()
@@ -77,8 +78,8 @@ def requires_auth(f):
 def generate_completion():
     # Extract data from the request
     data = request.json
-    prompt = data.get('prompt', '')
-    max_tokens = data.get('max_tokens', 50)
+    prompt = "<|begin_of_text|>" + data.get('prompt', '')
+    max_tokens = min(data.get('max_tokens', 100), 4096)
     model_id = data.get('model',None)
     temprature = data.get('temperature', 0.7)
     if model_id is None:
@@ -111,7 +112,7 @@ def generate_chat_completion():
     # Extract chat history and max_tokens from the request
     data = request.json
     messages = data.get('messages', [])
-    max_tokens = data.get('max_tokens', 50)
+    max_tokens = min(data.get('max_tokens', 100), 4096)
     model_id = data.get('model', None)
     stream = data.get('stream', False)
     temprature = data.get('temperature', 0.7)
@@ -122,13 +123,16 @@ def generate_chat_completion():
         return Response("Invalid model parameter", 400)
     
     # Prepare prompt from messages (chat history)
-    prompt = ""
-    for message in messages:
+    prompt = "<|begin_of_text|>"
+    for i, message in enumerate(messages):
         role = message.get('role')
         content = message.get('content')
+        if i == 0 and role != "system":
+            today = date.today().strftime("%B %d, %Y")
+            prompt += f"<|start_header_id|>system<|end_header_id|>\n\nToday Date: {today}\nYou are a helpful assistant. You can answer questions about any topic.<|eot_id|>"
         if role and content:
-            prompt += f"{role.capitalize()}: {content}\n"
-    prompt += "Assistant: "
+            prompt += f"<|start_header_id|>{role}<|end_header_id|>\n\n {content}<|eot_id|>"
+    prompt += "<|start_header_id|>assistant<|end_header_id|>\n\n"
     
     if stream:
         # Stream the completion in OpenAI-compatible format
