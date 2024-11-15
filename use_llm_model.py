@@ -21,7 +21,7 @@ def get_completion(prompt):
 # Example of using the chat completions endpoint
 def get_chat_completion(messages):
     response = client.chat.completions.create(
-        model="small_llm",  # This model name is for compatibility; replace as needed
+        model="bigger_llm",  # This model name is for compatibility; replace as needed
         messages=messages,
         max_tokens=1024,
         stream=True
