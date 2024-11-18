@@ -3,10 +3,12 @@ from openai import OpenAI
 # Override the OpenAI API's base URL and API key
 api_base = "http://localhost:5000/v1"
 api_embed = "http://localhost:5001/v1"
+api_stt = "http://localhost:5002/v1"
 api_key = "metacentrum"  # Replace with your API token
 
 client = OpenAI(api_key=api_key, base_url=api_base)
 embed_client = OpenAI(api_key=api_key, base_url=api_embed)
+stt_client = OpenAI(api_key=api_key, base_url=api_stt)
 
 
 # Example of using the completions endpoint
@@ -37,6 +39,13 @@ def get_embedding(text):
     )
     return response.data[0].embedding
 
+def transcribe_audio(audio_file):
+    response = stt_client.audio.transcriptions.create(
+        model="whisper-small",
+        file=audio_file
+    )
+    return response.text
+
 # Test with a prompt (completions endpoint)
 prompt = "What is the capital of France?"
 #print("Completion:", get_completion(prompt))
@@ -47,9 +56,15 @@ messages = [
     {"role": "assistant", "content": "The capital of France is Paris."},
     {"role": "user", "content": "Can you tell me more about it?"}
 ]
-get_chat_completion(messages)
+#get_chat_completion(messages)
 
 
 # Test with an embedding request
 text = "This is a test sentence."
 #print("Embedding:", get_embedding(text))
+
+
+# Test with an audio transcription request
+audio_file = "CantinaBand3.wav"
+file_obj = open(audio_file, "rb")
+print("Transcription:", transcribe_audio(file_obj))
