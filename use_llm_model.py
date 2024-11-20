@@ -14,7 +14,7 @@ stt_client = OpenAI(api_key=api_key, base_url=api_stt)
 # Example of using the completions endpoint
 def get_completion(prompt):
     response = client.completions.create(
-        model="small_llm",  # This model name is for compatibility; replace as needed
+        model="Llama-3.2-1B",  # This model name is for compatibility; replace as needed
         prompt=prompt,
         max_tokens=50
     )
@@ -23,7 +23,7 @@ def get_completion(prompt):
 # Example of using the chat completions endpoint
 def get_chat_completion(messages):
     response = client.chat.completions.create(
-        model="bigger_llm",  # This model name is for compatibility; replace as needed
+        model="Llama-3.2-3B",  # This model name is for compatibility; replace as needed
         messages=messages,
         max_tokens=1024,
         stream=True
@@ -34,7 +34,7 @@ def get_chat_completion(messages):
 
 def get_embedding(text):
     response = embed_client.embeddings.create(
-        model="bigger_vectors",
+        model="all-mpnet-base-v1",
         input=text
     )
     return response.data[0].embedding

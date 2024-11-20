@@ -7,12 +7,12 @@ import os
 app = Flask(__name__)
 
 model_dict = {
-    "small_vectors": "sentence-transformers/all-MiniLM-L6-v2",
-    "bigger_vectors": "sentence-transformers/all-mpnet-base-v1"
+    "all-MiniLM-L6-v2": "sentence-transformers/all-MiniLM-L6-v2",
+    "all-mpnet-base-v1": "sentence-transformers/all-mpnet-base-v1"
 }
 models = {
-    "small_vectors": None,
-    "bigger_vectors": None
+    "all-MiniLM-L6-v2": None,
+    "all-mpnet-base-v1": None
 }
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"

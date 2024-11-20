@@ -11,12 +11,12 @@ from datetime import date
 app = Flask(__name__)
 
 model_dict = {
-    "small_llm": "unsloth/Llama-3.2-1B-Instruct",
-    "bigger_llm": "unsloth/Llama-3.2-3B-Instruct"
+    "Llama-3.2-1B": "unsloth/Llama-3.2-1B-Instruct",
+    "Llama-3.2-3B": "unsloth/Llama-3.2-3B-Instruct"
 }
 models = {
-    "small_llm": None,
-    "bigger_llm": None
+    "Llama-3.2-1B": None,
+    "Llama-3.2-3B": None
 }
 
 API_TOKEN = os.getenv("LOCAL_API_TOKEN", "metacentrum") 
