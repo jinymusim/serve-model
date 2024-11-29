@@ -38,7 +38,7 @@ def load_models():
     for model_id, model_name in model_dict.items():
         logger.info(f"Loading model {model_id} from {model_name}")
         tokenizer = AutoTokenizer.from_pretrained(model_name)
-        model = ORTModelForCausalLM.from_pretrained(model_name, subfolder="resolve/main/onnx/")
+        model = ORTModelForCausalLM.from_pretrained(model_name, subfolder="main/onnx/")
         model = model.to(DEVICE)
         models[model_id] = (model, tokenizer)
 
