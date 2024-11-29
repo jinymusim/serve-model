@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, Response
-from transformers import AutoModelForCausalLM, AutoTokenizer, TextIteratorStreamer
+from optimum.onnxruntime import ORTModelForCausalLM
+from transformers import  AutoTokenizer, TextIteratorStreamer
 from functools import wraps
 import torch
 import json
@@ -11,8 +12,8 @@ from datetime import date
 app = Flask(__name__)
 
 model_dict = {
-    "Llama-3.2-1B": "unsloth/Llama-3.2-1B-Instruct",
-    "Llama-3.2-3B": "unsloth/Llama-3.2-3B-Instruct"
+    "Llama-3.2-1B": "onnx-community/Llama-3.2-1B-Instruct",
+    "Llama-3.2-3B": "onnx-community/Llama-3.2-3B-Instruct-ONNX"
 }
 models = {
     "Llama-3.2-1B": None,
@@ -37,7 +38,7 @@ def load_models():
     for model_id, model_name in model_dict.items():
         logger.info(f"Loading model {model_id} from {model_name}")
         tokenizer = AutoTokenizer.from_pretrained(model_name)
-        model = AutoModelForCausalLM.from_pretrained(model_name, device_map="auto", torch_dtype=torch.float16)
+        model = ORTModelForCausalLM.from_pretrained(model_name)
         model = model.to(DEVICE)
         models[model_id] = (model, tokenizer)
 

@@ -2,5 +2,9 @@ transformers
 accelerate
 flask
 torch
+torch-tensorrt 
+tensorrt
 openai
-sentence-transformers
+onnxruntime-gpu
+optimum[onnxruntime-gpu]
+sentence-transformers[onnx-gpu]
