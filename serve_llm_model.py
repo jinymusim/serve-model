@@ -12,8 +12,8 @@ from datetime import date
 app = Flask(__name__)
 
 model_dict = {
-    "Llama-3.2-1B": "onnx-community/Llama-3.2-1B-Instruct",
-    "Llama-3.2-3B": "onnx-community/Llama-3.2-3B-Instruct-ONNX"
+    "Llama-3.2-1B": "onnx-community/Llama-3.2-1B-Instruct/onnx/model_q4.onnx",
+    "Llama-3.2-3B": "onnx-community/Llama-3.2-3B-Instruct/onnx/model_q4.onnx"
 }
 models = {
     "Llama-3.2-1B": None,
@@ -38,7 +38,7 @@ def load_models():
     for model_id, model_name in model_dict.items():
         logger.info(f"Loading model {model_id} from {model_name}")
         tokenizer = AutoTokenizer.from_pretrained(model_name)
-        model = ORTModelForCausalLM.from_pretrained(model_name, subfolder="onnx/")
+        model = ORTModelForCausalLM.from_pretrained(model_name)
         model = model.to(DEVICE)
         models[model_id] = (model, tokenizer)
 
