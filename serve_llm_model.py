@@ -203,7 +203,7 @@ def generate_chat_completion():
     if logprobs:
         scores = {
                 tokenizer.decode(outputs['sequences'][0][inputs['input_ids'].shape[-1] + i]) :
-                outputs['scores'][i][0, outputs['sequences'][0][inputs['input_ids'].shape[-1] + i]].numpy().item()
+                outputs['scores'][i][0, outputs['sequences'][0][inputs['input_ids'].shape[-1] + i]].cpu().item()
                 for i in range(
                     outputs['sequences'][0].shape[-1] - inputs['input_ids'].shape[-1]
                 )
