@@ -19,7 +19,7 @@ DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 def load_models():
     for model_id, model_name in model_dict.items():
-        model = SentenceTransformer(model_name, backend="onnx")
+        model = SentenceTransformer(model_name)
         model = model.to(DEVICE)
         models[model_id] = model
 

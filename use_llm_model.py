@@ -63,8 +63,19 @@ messages = [
 text = "This is a test sentence."
 #print("Embedding:", get_embedding(text))
 
+def get_chat_completion_no_stream(messages):
+    response = client.chat.completions.create(
+        model="Llama-3.2-3B",  # This model name is for compatibility; replace as needed
+        messages=messages,
+        max_tokens=10,
+        stream=False
+    )
+    print(response.choices[0].message.content)
 
-# Test with an audio transcription request
-audio_file = "CantinaBand3.wav"
-file_obj = open(audio_file, "rb")
-print("Transcription:", transcribe_audio(file_obj))
+
+# Test with a chat conversation (chat completions endpoint)
+messages = [
+    {"role": "user", "content": "Is Paris the capital of France?"},
+]
+
+get_chat_completion_no_stream(messages)

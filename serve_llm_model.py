@@ -119,9 +119,18 @@ def generate_completion():
     # Tokenize and generate response
     inputs = tokenizer(prompt, return_tensors="pt").to(DEVICE)
     logger.info(f"Input Tokens: {inputs['input_ids'].shape[-1]}")
-    outputs = model.generate(inputs['input_ids'], max_new_tokens=max_tokens, do_sample=True, temperature=temperature)
-    logger.info(f"Output Tokens: {len(outputs[0])}")
-    completion = tokenizer.decode(outputs[0], skip_special_tokens=True)
+    outputs = model.generate(
+        inputs['input_ids'], 
+        attention_mask=inputs['attention_mask'],
+        max_new_tokens=max_tokens, 
+        do_sample=True, 
+        temperature=temperature, 
+        top_p=0.99,
+        top_k=1000,
+    )
+    
+    logger.info(f"Output Tokens: {len(outputs[0][inputs['input_ids'].shape[-1]:])}")
+    completion = tokenizer.decode(outputs[0][inputs['input_ids'].shape[-1]:], skip_special_tokens=True)
     
     # Format response similar to OpenAI's API
     response = {
@@ -174,9 +183,28 @@ def generate_chat_completion():
     # Tokenize and generate response
     inputs = tokenizer(prompt, return_tensors="pt").to(DEVICE)
     logger.info(f"Input Tokens: {inputs['input_ids'].shape[-1]}")
-    outputs = model.generate(inputs['input_ids'], max_new_tokens=max_tokens, do_sample=True, temperature=temperature)
-    logger.info(f"Output Tokens: {len(outputs[0])}")
-    completion = tokenizer.decode(outputs[0], skip_special_tokens=True)
+    outputs = model.generate(
+        inputs['input_ids'], 
+        attention_mask=inputs['attention_mask'],
+        max_new_tokens=max_tokens, 
+        do_sample=True, 
+        temperature=temperature, 
+        top_p=0.99,
+        top_k=1000,
+        tokenizer=tokenizer,
+        renormalize_logits=True,
+        output_scores=True,
+        return_legacy_cache=False,
+        stop_strings=["<|eot_id|>", "<|start_header_id|>", "<|end_header_id|>"],
+        return_dict_in_generate=True
+    )
+    scores = [
+            outputs['scores'][i][0, outputs['sequences'][0][inputs['input_ids'].shape[-1] + i]] for i in range(
+                outputs['sequences'][0].shape[-1] - inputs['input_ids'].shape[-1]
+            )
+        ]
+    logger.info(f"Output Tokens: {len(outputs['sequences'][0][inputs['input_ids'].shape[-1]:])}")
+    completion = tokenizer.decode(outputs['sequences'][0][inputs['input_ids'].shape[-1]:], skip_special_tokens=True)
     
     # Format response similar to OpenAI's API
     response = {
