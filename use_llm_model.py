@@ -67,10 +67,13 @@ def get_chat_completion_no_stream(messages):
     response = client.chat.completions.create(
         model="Llama-3.2-3B",  # This model name is for compatibility; replace as needed
         messages=messages,
-        max_tokens=10,
+        max_tokens=1,
+        logprobs=True,
         stream=False
     )
     print(response.choices[0].message.content)
+    print(response.choices[0].logprobs.to_dict().get("Yes", float("-inf")))
+    
 
 
 # Test with a chat conversation (chat completions endpoint)

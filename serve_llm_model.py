@@ -154,6 +154,7 @@ def generate_chat_completion():
     max_tokens = min(data.get('max_tokens', 100), 4096)
     model_id = data.get('model', None)
     stream = data.get('stream', False)
+    logprobs = data.get('logprobs', False)
     temperature = data.get('temperature', 0.7)
     if model_id is None:
         return Response("Missing model parameter", 400)
@@ -198,11 +199,15 @@ def generate_chat_completion():
         stop_strings=["<|eot_id|>", "<|start_header_id|>", "<|end_header_id|>"],
         return_dict_in_generate=True
     )
-    scores = [
-            outputs['scores'][i][0, outputs['sequences'][0][inputs['input_ids'].shape[-1] + i]] for i in range(
-                outputs['sequences'][0].shape[-1] - inputs['input_ids'].shape[-1]
-            )
-        ]
+    scores = None
+    if logprobs:
+        scores = {
+                tokenizer.decode(outputs['sequences'][0][inputs['input_ids'].shape[-1] + i]) :
+                outputs['scores'][i][0, outputs['sequences'][0][inputs['input_ids'].shape[-1] + i]].numpy().item()
+                for i in range(
+                    outputs['sequences'][0].shape[-1] - inputs['input_ids'].shape[-1]
+                )
+        } 
     logger.info(f"Output Tokens: {len(outputs['sequences'][0][inputs['input_ids'].shape[-1]:])}")
     completion = tokenizer.decode(outputs['sequences'][0][inputs['input_ids'].shape[-1]:], skip_special_tokens=True)
     
@@ -214,6 +219,7 @@ def generate_chat_completion():
                     "role": "assistant",
                     "content": completion
                 },
+                "logprobs" : scores,
                 "index": 0,
                 "finish_reason": "length"
             }
