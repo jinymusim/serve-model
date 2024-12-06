@@ -3,4 +3,5 @@ accelerate
 flask
 torch
 openai
+unsloth
 sentence-transformers
