@@ -16,9 +16,10 @@ def get_completion(prompt):
     response = client.completions.create(
         model="Llama-3.2-1B",  # This model name is for compatibility; replace as needed
         prompt=prompt,
-        max_tokens=50
+        max_tokens=50,
     )
     return response.choices[0].text
+
 
 # Example of using the chat completions endpoint
 def get_chat_completion(messages):
@@ -26,42 +27,42 @@ def get_chat_completion(messages):
         model="Llama-3.2-3B",  # This model name is for compatibility; replace as needed
         messages=messages,
         max_tokens=1024,
-        stream=True
+        stream=True,
     )
     print("Streaming response:", end=" ")
     for chunk in response:
         print(chunk.choices[0].delta.content, end="", flush=True)
 
+
 def get_embedding(text):
-    response = embed_client.embeddings.create(
-        model="all-mpnet-base-v1",
-        input=text
-    )
+    response = embed_client.embeddings.create(model="all-mpnet-base-v1", input=text)
     return response.data[0].embedding
+
 
 def transcribe_audio(audio_file):
     response = stt_client.audio.transcriptions.create(
-        model="whisper-small",
-        file=audio_file
+        model="whisper-small", file=audio_file
     )
     return response.text
 
+
 # Test with a prompt (completions endpoint)
 prompt = "What is the capital of France?"
-#print("Completion:", get_completion(prompt))
+# print("Completion:", get_completion(prompt))
 
 # Test with a chat conversation (chat completions endpoint)
 messages = [
     {"role": "user", "content": "What is the capital of France?"},
     {"role": "assistant", "content": "The capital of France is Paris."},
-    {"role": "user", "content": "Can you tell me more about it?"}
+    {"role": "user", "content": "Can you tell me more about it?"},
 ]
-#get_chat_completion(messages)
+# get_chat_completion(messages)
 
 
 # Test with an embedding request
 text = "This is a test sentence."
-#print("Embedding:", get_embedding(text))
+# print("Embedding:", get_embedding(text))
+
 
 def get_chat_completion_no_stream(messages):
     response = client.chat.completions.create(
@@ -69,11 +70,10 @@ def get_chat_completion_no_stream(messages):
         messages=messages,
         max_tokens=1,
         logprobs=True,
-        stream=False
+        stream=False,
     )
     print(response.choices[0].message.content)
     print(response.choices[0].logprobs.to_dict().get("Yes", float("-inf")))
-    
 
 
 # Test with a chat conversation (chat completions endpoint)
