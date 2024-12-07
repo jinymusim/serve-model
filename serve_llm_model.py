@@ -1,13 +1,14 @@
 from flask import Flask, request, jsonify, Response
-from unsloth import FastLanguageModel
 from transformers import TextIteratorStreamer
 from functools import wraps
+from threading import Thread
+from datetime import date
+import sys
 import torch
 import json
 import os
 import logging
-from threading import Thread
-from datetime import date
+
 
 app = Flask(__name__)
 
@@ -30,14 +31,25 @@ logging.basicConfig(
 
 logger = logging.getLogger("llm server")
 
+try:
+    logger.log(logging.INFO, "Trying to use unsloth")
+    from unsloth import FastLanguageModel
+except ImportError:
+    logger.log(logging.WARNING, "Reverting to Hugging Face Transformers")
+    from transformers import AutoModelForCausalLM, AutoTokenizer
+
 
 def load_models():
     for model_id, model_name in model_dict.items():
         logger.info(f"Loading model {model_id} from {model_name}")
-        model, tokenizer = FastLanguageModel.from_pretrained(
-            model_name, dtype=None, load_in_4bit=True
-        )
-        model = FastLanguageModel.for_inference(model)
+        if "unsloth" not in sys.modules:
+            model = AutoModelForCausalLM.from_pretrained(model_name).to(DEVICE)
+            tokenizer = AutoTokenizer.from_pretrained(model_name)
+        else:
+            model, tokenizer = FastLanguageModel.from_pretrained(
+                model_name, dtype=None, load_in_4bit=True
+            )
+            model = FastLanguageModel.for_inference(model)
         models[model_id] = (model, tokenizer)
 
 
